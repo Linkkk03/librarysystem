@@ -1,0 +1,679 @@
+User.java
+public class User {
+    private int userId;
+    private String username;
+    private String password;
+    private String email;
+    private int status; // 0-正常, 1-禁用
+    
+    // 最大借阅数量
+    private static final int MAX_BORROW = 5;
+    
+    public User() {}
+    
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    
+    // Getters and Setters
+    public int getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public int getStatus() {
+        return status;
+    }
+    
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
+    public static int getMaxBorrow() {
+        return MAX_BORROW;
+    }
+}
+
+Book.java
+import java.util.Date;
+
+public class Book {
+    private int bookId;
+    private String title;
+    private String author;
+    private String publisher;
+    private String isbn;
+    private Date publishDate;
+    private int totalCopies;
+    private int available;
+    private String category;
+    
+    public Book() {}
+    
+    public Book(String title, String author, String publisher, int totalCopies) {
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.totalCopies = totalCopies;
+        this.available = totalCopies;
+    }
+    
+    // Getters and Setters
+    public int getBookId() {
+        return bookId;
+    }
+    
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public String getAuthor() {
+        return author;
+    }
+    
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+    
+    public String getPublisher() {
+        return publisher;
+    }
+    
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+    
+    public String getIsbn() {
+        return isbn;
+    }
+    
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+    
+    public Date getPublishDate() {
+        return publishDate;
+    }
+    
+    public void setPublishDate(Date publishDate) {
+        this.publishDate = publishDate;
+    }
+    
+    public int getTotalCopies() {
+        return totalCopies;
+    }
+    
+    public void setTotalCopies(int totalCopies) {
+        this.totalCopies = totalCopies;
+    }
+    
+    public int getAvailable() {
+        return available;
+    }
+    
+    public void setAvailable(int available) {
+        this.available = available;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+    
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    
+    // 检查图书是否可借
+    public boolean isAvailable() {
+        return available > 0;
+    }
+}
+
+BorrowBook.java
+import java.util.Date;
+public class BorrowRecord {
+    private int recordId;
+    private int userId;
+    private int bookId;
+    private Date borrowDate;
+    private Date dueDate;
+    private Date returnDate;
+    private int status; // 0-借出, 1-已归还
+    
+    public BorrowRecord() {}
+    
+    public BorrowRecord(int userId, int bookId) {
+        this.userId = userId;
+        this.bookId = bookId;
+        this.borrowDate = new Date();
+        this.dueDate = calculateDueDate();
+        this.status = 0;
+    }
+    
+    // 计算应还日期（借阅后1个月）
+    private Date calculateDueDate() {
+        long time = borrowDate.getTime();
+        return new Date(time + 30L * 24 * 60 * 60 * 1000);
+    }
+    
+    // Getters and Setters
+    public int getRecordId() {
+        return recordId;
+    }
+    
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+    
+    public int getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
+    public int getBookId() {
+        return bookId;
+    }
+    
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+    
+    public Date getBorrowDate() {
+        return borrowDate;
+    }
+    
+    public void setBorrowDate(Date borrowDate) {
+        this.borrowDate = borrowDate;
+    }
+    
+    public Date getDueDate() {
+        return dueDate;
+    }
+    
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+    
+    public Date getReturnDate() {
+        return returnDate;
+    }
+    
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+    
+    public int getStatus() {
+        return status;
+    }
+    
+    public void setStatus(int status) {
+        this.status = status;
+    }
+}
+
+Userservice.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserService {
+    // 模拟用户数据
+    private List<User> users = new ArrayList<>();
+    
+    public UserService() {
+        // 初始化测试用户
+        users.add(new User("admin", "admin123"));
+        users.add(new User("user1", "password1"));
+    }
+    
+    // 用户登录
+    public User login(String username, String password) {
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+    
+    // 用户注册
+    public boolean register(User newUser) {
+        // 检查用户名是否已存在
+        for (User user : users) {
+            if (user.getUsername().equals(newUser.getUsername())) {
+                return false;
+            }
+        }
+        users.add(newUser);
+        return true;
+    }
+    
+    // 获取用户借阅数量
+    public int getBorrowedCount(int userId, List<BorrowRecord> borrowRecords) {
+        int count = 0;
+        for (BorrowRecord record : borrowRecords) {
+            if (record.getUserId() == userId && record.getStatus() == 0) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
+
+Bookservice.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class BookService {
+    // 模拟图书数据
+    private List<Book> books = new ArrayList<>();
+    
+    public BookService() {
+        // 初始化测试图书
+        books.add(new Book("Java语言程序设计", "邓莉等著", "清华大学出版社", 5));
+        books.add(new Book("红楼梦", "曹雪芹", "人民文学出版社", 3));
+        books.add(new Book("活着", "余华", "作家出版社", 2));
+        books.add(new Book("小王子", "安托万·德·圣-埃克苏佩里", "人民文学出版社", 4));
+    }
+    
+    // 获取所有图书
+    public List<Book> getAllBooks() {
+        return books;
+    }
+    
+    // 根据ID获取图书
+    public Book getBookById(int bookId) {
+        for (Book book : books) {
+            if (book.getBookId() == bookId) {
+                return book;
+            }
+        }
+        return null;
+    }
+    
+    // 搜索图书
+    public List<Book> searchBooks(String keyword) {
+        List<Book> result = new ArrayList<>();
+        String lowerKeyword = keyword.toLowerCase();
+        
+        for (Book book : books) {
+            if (book.getTitle().toLowerCase().contains(lowerKeyword) ||
+                book.getAuthor().toLowerCase().contains(lowerKeyword) ||
+                book.getPublisher().toLowerCase().contains(lowerKeyword)) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+    
+    // 更新图书可用数量
+    public void updateBookAvailability(int bookId, int change) {
+        Book book = getBookById(bookId);
+        if (book != null) {
+            book.setAvailable(book.getAvailable() + change);
+        }
+    }
+}
+
+Borrowservice.java
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class BorrowService {
+    // 模拟借阅记录
+    private List<BorrowRecord> borrowRecords = new ArrayList<>();
+    
+    private BookService bookService;
+    private UserService userService;
+    
+    public BorrowService(BookService bookService, UserService userService) {
+        this.bookService = bookService;
+        this.userService = userService;
+    }
+    
+    // 借阅图书
+    public boolean borrowBook(int userId, int bookId) {
+        // 检查用户是否已达到最大借阅量
+        int borrowedCount = userService.getBorrowedCount(userId, borrowRecords);
+        if (borrowedCount >= User.getMaxBorrow()) {
+            return false;
+        }
+        
+        // 检查图书是否可借
+        Book book = bookService.getBookById(bookId);
+        if (book == null || !book.isAvailable()) {
+            return false;
+        }
+        
+        // 创建借阅记录
+        BorrowRecord record = new BorrowRecord(userId, bookId);
+        borrowRecords.add(record);
+        
+        // 更新图书可用数量
+        bookService.updateBookAvailability(bookId, -1);
+        
+        return true;
+    }
+    
+    // 归还图书
+    public boolean returnBook(int userId, int bookId) {
+        // 查找未归还的借阅记录
+        for (BorrowRecord record : borrowRecords) {
+            if (record.getUserId() == userId && 
+                record.getBookId() == bookId && 
+                record.getStatus() == 0) {
+                
+                // 更新记录状态
+                record.setStatus(1);
+                record.setReturnDate(new Date());
+                
+                // 更新图书可用数量
+                bookService.updateBookAvailability(bookId, 1);
+                
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // 获取用户的借阅记录
+    public List<BorrowRecord> getUserRecords(int userId) {
+        List<BorrowRecord> userRecords = new ArrayList<>();
+        for (BorrowRecord record : borrowRecords) {
+            if (record.getUserId() == userId) {
+                userRecords.add(record);
+            }
+        }
+        return userRecords;
+    }
+    
+    // 获取用户当前借阅的图书(未归还的)
+    public List<BorrowRecord> getUserCurrentBorrows(int userId) {
+        List<BorrowRecord> currentBorrows = new ArrayList<>();
+        for (BorrowRecord record : borrowRecords) {
+            if (record.getUserId() == userId && record.getStatus() == 0) {
+                currentBorrows.add(record);
+            }
+        }
+        return currentBorrows;
+    }
+}
+
+Usecontroller.java
+import java.util.List;
+
+public class UserController {
+    private UserService userService;
+    private BorrowService borrowService;
+    
+    public UserController(UserService userService, BorrowService borrowService) {
+        this.userService = userService;
+        this.borrowService = borrowService;
+    }
+    
+    // 处理登录请求
+    public User login(String username, String password) {
+        return userService.login(username, password);
+    }
+    
+    // 处理注册请求
+    public boolean register(String username, String password) {
+        User newUser = new User(username, password);
+        return userService.register(newUser);
+    }
+    
+    // 获取用户借阅信息
+    public String getUserBorrowInfo(int userId) {
+        int borrowedCount = userService.getBorrowedCount(userId, borrowService.getUserBorrowRecords(userId));
+        return "已借阅 " + borrowedCount + " 本 (最多可借 " + User.getMaxBorrow() + " 本)";
+    }
+    
+    // 获取用户当前借阅的图书
+    public List<BorrowRecord> getUserCurrentBorrows(User userId) {
+        return borrowService.getUserCurrentBorrows(userId);
+    }
+
+    public List<BorrowRecord> getUserCurrentBorrows(int userId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserCurrentBorrows'");
+    }
+}
+
+BookController.java
+import java.util.List;
+
+public class BookController {
+    private BookService bookService;
+    private BorrowService borrowService;
+    
+    public BookController(BookService bookService, BorrowService borrowService) {
+        this.bookService = bookService;
+        this.borrowService = borrowService;
+    }
+    
+    // 获取所有图书
+    public List<Book> getAllBooks() {
+        return bookService.getAllBooks();
+    }
+    
+    // 搜索图书
+    public List<Book> searchBooks(String keyword) {
+        return bookService.searchBooks(keyword);
+    }
+    
+    // 获取图书详情
+    public Book getBookDetails(Long bookId) {
+        return bookService.getBookById(bookId);
+    }
+    
+    // 借阅图书
+    public boolean borrowBook(int userId, int bookId) {
+        return borrowService.borrowBook(userId, bookId);
+    }
+    
+    // 归还图书
+    public boolean returnBook(int userId, int bookId) {
+        return borrowService.returnBook(userId, bookId);
+    }
+    
+    // 检查图书是否可借
+    public boolean isBookAvailable(Long bookId) {
+        Book book = bookService.getBookById(bookId);
+        return book != null && book.isAvailable();
+    }
+}
+
+LibraryApp.java
+import java.util.ArrayList;
+import java.util.List;
+
+public class LibraryApp {
+    private UserService userService;
+    private BookService bookService;
+    private BorrowService borrowService;
+    private UserController userController;
+    private BookController bookController;
+    
+    // 当前登录用户
+    private User currentUser;
+    
+    public LibraryApp() {
+        // 初始化服务
+        userService = new UserService();
+        bookService = new BookService();
+        borrowService = new BorrowService(bookService, userService);
+        
+        // 初始化控制器
+        userController = new UserController(userService, borrowService);
+        bookController = new BookController(bookService, borrowService);
+    }
+    
+    // 登录功能
+    public boolean login(String username, String password) {
+        currentUser = userController.login(username, password);
+        return currentUser != null;
+    }
+    
+    // 注册功能
+    public boolean register(String username, String password) {
+        return userController.register(username, password);
+    }
+    
+    // 获取当前用户
+    public User getCurrentUser() {
+        return currentUser;
+    }
+    
+    // 获取用户借阅信息
+    public String getUserBorrowInfo() {
+        if (currentUser == null) return "请先登录";
+        return userController.getUserBorrowInfo(currentUser.getUserId());
+    }
+    
+    // 获取所有图书
+    public List<Book> getAllBooks() {
+        return bookController.getAllBooks();
+    }
+    
+    // 搜索图书
+    public List<Book> searchBooks(String keyword) {
+        return bookController.searchBooks(keyword);
+    }
+    
+    // 获取图书详情
+    public Book getBookDetails(int bookId) {
+        return bookController.getBookDetails(bookId);
+    }
+    
+    // 借阅图书
+    public boolean borrowBook(int bookId) {
+        if (currentUser == null) return false;
+        return bookController.borrowBook(currentUser.getUserId(), bookId);
+    }
+    
+    // 归还图书
+    public boolean returnBook(int bookId) {
+        if (currentUser == null) return false;
+        return bookController.returnBook(currentUser.getUserId(), bookId);
+    }
+    
+    // 获取用户当前借阅的图书
+    public List<BorrowRecord> getUserCurrentBorrows() {
+        if (currentUser == null) return new ArrayList<>();
+        return userController.getUserCurrentBorrows(currentUser.getUserId());
+    }
+    
+    // 检查图书是否可借
+    public boolean isBookAvailable(int bookId) {
+        return bookController.isBookAvailable(bookId);
+    }
+    
+    // 登出
+    public void logout() {
+        currentUser = null;
+    }
+
+}
+
+Main.java
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        LibraryApp app = new LibraryApp();
+        
+        // 登录测试
+        boolean loginSuccess = app.login("admin", "admin123");
+        System.out.println("登录结果: " + (loginSuccess ? "成功" : "失败"));
+        
+        if (loginSuccess) {
+            // 获取当前用户信息
+            User user = app.getCurrentUser();
+            System.out.println("当前用户: " + user.getUsername());
+            
+            // 获取借阅信息
+            System.out.println(app.getUserBorrowInfo());
+            
+            // 获取所有图书
+            List<Book> books = app.getAllBooks();
+            System.out.println("\n所有图书:");
+            for (Book book : books) {
+                System.out.println(book.getTitle() + " - " + book.getAuthor() + 
+                                 " (" + (book.isAvailable() ? "可借" : "不可借") + ")");
+            }
+            
+            // 借阅第一本书
+            if (books.size() > 0) {
+                int bookId = books.get(0).getBookId();
+                boolean borrowResult = app.borrowBook(bookId);
+                System.out.println("\n借阅图书ID " + bookId + " 结果: " + 
+                                  (borrowResult ? "成功" : "失败"));
+                
+                // 再次查看借阅信息
+                System.out.println("\n借阅后信息:");
+                System.out.println(app.getUserBorrowInfo());
+                
+                // 查看当前借阅的图书
+                List<BorrowRecord> currentBorrows = app.getUserCurrentBorrows();
+                System.out.println("\n当前借阅的图书:");
+                for (BorrowRecord record : currentBorrows) {
+                    Book borrowedBook = app.getBookDetails(record.getBookId());
+                    System.out.println(borrowedBook.getTitle() + " - 应还日期: " + 
+                                     record.getDueDate());
+                }
+                
+                // 归还图书
+                boolean returnResult = app.returnBook(bookId);
+                System.out.println("\n归还图书ID " + bookId + " 结果: " + 
+                                  (returnResult ? "成功" : "失败"));
+                
+                // 最终借阅信息
+                System.out.println("\n归还后信息:");
+                System.out.println(app.getUserBorrowInfo());
+            }
+            
+            // 登出
+            app.logout();
+            System.out.println("\n已登出");
+        }
+    }
+}
