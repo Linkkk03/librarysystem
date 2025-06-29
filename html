@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 登录界面样式 */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .login-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .remember-me input {
+            margin-right: 5px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .login-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .register-link {
+            text-align: center;
+            display: block;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        
+        .register-link:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* 主界面样式 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .search-box {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .book-cover {
+            height: 200px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            overflow: hidden;
+        }
+        
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .book-info {
+            padding: 15px;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .book-author {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .book-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .status-available {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .status-unavailable {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .borrow-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .borrow-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        /* 图书详情界面样式 */
+        .book-detail-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .book-detail-header {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .detail-cover {
+            width: 200px;
+            height: 280px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+        
+        .detail-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .detail-info {
+            flex-grow: 1;
+        }
+        
+        .detail-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .detail-meta {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-status {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .back-btn, .borrow-detail-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .back-btn {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .borrow-detail-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .borrow-detail-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        /* 用户中心界面样式 */
+        .user-center-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            margin-right: 20px;
+        }
+        
+        .user-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .borrow-stats {
+            color: #666;
+        }
+        
+        .borrowed-books {
+            margin-top: 20px;
+        }
+        
+        .borrowed-books h3 {
+            margin-bottom: 15px;
+        }
+        
+        .book-item {
+            display: flex;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .book-item-cover {
+            width: 60px;
+            height: 80px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        
+        .book-item-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .book-item-info {
+            flex-grow: 1;
+        }
+        
+        .book-item-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .book-item-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .book-item-days {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .return-btn {
+            padding: 5px 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: center;
+        }
+        
+        /* 借阅成功提示 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-book-info {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .modal-book-cover {
+            width: 80px;
+            height: 110px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        
+        .modal-book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-book-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .modal-book-author {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .modal-due-date {
+            color: #ff9800;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .modal-footer {
+            text-align: right;
+        }
+        
+        .confirm-btn {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 页面切换 */
+        .page {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div class="page active" id="login-page">
+        <div class="login-container">
+            <div class="login-form">
+                <h2>图书借阅管理系统登录</h2>
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" placeholder="请输入用户名">
+                    <div class="error-message" id="username-error">用户名不能为空</div>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码">
+                    <div class="error-message" id="password-error">密码不能为空</div>
+                </div>
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">记住密码</label>
+                </div>
+                <button class="login-btn" id="login-btn">登录</button>
+                <a href="#" class="register-link" id="register-link">注册新账户</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div class="page" id="main-page">
+        <div class="navbar">
+            <div class="logo">图书借阅管理系统</div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link" data-page="main-page">图书管理</a></li>
+                <li><a href="#" class="nav-link" data-page="user-center-page">用户中心</a></li>
+                <li><a href="#" id="logout-link">退出登录</a></li>
+            </ul>
+        </div>
+        
+        <div class="container">
+            <div class="header">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索图书...">
+                </div>
+                <div class="user-info">
+                    <img src="https://ts3.tc.mm.bing.net/th/id/OIP-C.7GLMYPqMlt2LgkbPsOnDIAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" alt="用户头像">
+                    <span id="header-username">用户名</span>
+                </div>
+            </div>
+            
+            <div class="book-list" id="book-list">
+                <!-- 图书卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 图书详情界面 -->
+    <div class="page" id="detail-page">
+        <div class="navbar">
+            <div class="logo">图书管理系统</div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link" data-page="main-page">图书管理</a></li>
+                <li><a href="#" class="nav-link" data-page="user-center-page">用户中心</a></li>
+                <li><a href="#" id="logout-link-2">退出登录</a></li>
+            </ul>
+        </div>
+        
+        <div class="container">
+            <div class="book-detail-container" id="book-detail">
+                <!-- 图书详情内容将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户中心界面 -->
+    <div class="page" id="user-center-page">
+        <div class="navbar">
+            <div class="logo">图书管理系统</div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-link" data-page="main-page">图书管理</a></li>
+                <li><a href="#" class="nav-link" data-page="user-center-page">用户中心</a></li>
+                <li><a href="#" id="logout-link-3">退出登录</a></li>
+            </ul>
+        </div>
+        
+        <div class="container">
+            <div class="user-center-container">
+                <div class="user-profile">
+                    <div class="user-avatar">"用户"</div>
+                    <div>
+                        <div class="user-name" id="profile-username">用户名</div>
+                        <div class="borrow-stats" id="borrow-stats">已借阅 0 本 (最多可借 5 本)</div>
+                    </div>
+                </div>
+                
+                <div class="borrowed-books">
+                    <h3>当前借阅的图书</h3>
+                    <div id="borrowed-books-list">
+                        <!-- 借阅的图书列表将通过JavaScript动态生成 -->
+                        <p>当前没有借阅的图书</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 借阅成功提示 -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal">
+            <div class="modal-header">借阅成功</div>
+            <div class="modal-body">
+                <div class="modal-book-info">
+                    <div class="modal-book-cover"><img id="modal-book-cover-img" src="" alt="封面"></div>
+                    <div>
+                        <div class="modal-book-title" id="modal-book-title">书名</div>
+                        <div class="modal-book-author" id="modal-book-author">作者</div>
+                        <div class="modal-due-date" id="modal-due-date">请在一个月之后还书</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="confirm-btn" id="confirm-btn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据 - 更新为指定的图书信息
+        const books = [
+            {
+                id: 1,
+                title: "Java语言程序设计",
+                author: "邓莉等著",
+                publisher: "清华大学出版社",
+                cover: "https://ts1.tc.mm.bing.net/th/id/R-C.484fbd9bf6c36712750453cd2515aee5?rik=xHGJ3W5obW27Qg&riu=http%3a%2f%2fwww.tup.tsinghua.edu.cn%2fupload%2fbigbookimg3%2f078479-01.jpg&ehk=2v3SVMyak9Zi3X13r1Zng4R0ascyfby4vDfYQGEj4us%3d&risl=&pid=ImgRaw&r=0",
+                available: true
+            },
+            {
+                id: 2,
+                title: "红楼梦",
+                author: "曹雪芹",
+                publisher: "人民文学出版社",
+                cover: "https://so1.360tres.com/t0198f3032b4e942d43.jpg",
+                available: false
+            },
+            {
+                id: 3,
+                title: "六爻",
+                author: "priest",
+                publisher: "北京联合出版公司",
+                cover: "https://img.alicdn.com/i4/919824317/O1CN01EYKDHx1hlELrkZry3_!!0-item_pic.jpg",
+                available: true
+            },
+            {
+                id: 4,
+                title: "活着",
+                author: "余华",
+                publisher: "作家出版社",
+                cover: "https://pic2.zhimg.com/v2-28d567e3553ed6d6fbf342b9fb64b7db_720w.jpg?source=172ae18b",
+                available: true
+            },
+            {
+                id: 5,
+                title: "小王子",
+                author: "安托万·德·圣-埃克苏佩里",
+                publisher: "人民文学出版社",
+                cover: "https://ts2.tc.mm.bing.net/th/id/OIP-C.R4aMp80VV23XXDqSwYvhxwHaLf?rs=1&pid=ImgDetMain&o=7&rm=3",
+                available: false
+            },
+            {
+                id: 6,
+                title: "管理学原理",
+                author: "斯蒂芬·P·罗宾斯",
+                publisher: "清华大学出版社",
+                cover: "https://ts1.tc.mm.bing.net/th/id/R-C.019b46422f6886e3a49d9033a9830b81?rik=1EQesu9HQiKu9g&riu=http%3a%2f%2fwww.tup.tsinghua.edu.cn%2fupload%2fbigbookimg3%2f067322-02.jpg&ehk=56osW8llQwcdJM4i%2fz4GFB%2b8D3IhZI%2bRoTCPqf0hLGQ%3d&risl=&pid=ImgRaw&r=0",
+                available: true
+            }
+        ];
+
+        const currentUser = {
+            id: 1,
+            username: "testuser",
+            maxBorrow: 5,
+            borrowedBooks: [
+                {
+                    bookId: 2,
+                    dueDate: "10天"
+                },
+                {
+                    bookId: 5,
+                    dueDate: "一个月"
+                }
+            ]
+        };
+
+        // DOM元素
+        const pages = document.querySelectorAll('.page');
+        const loginPage = document.getElementById('login-page');
+        const mainPage = document.getElementById('main-page');
+        const detailPage = document.getElementById('detail-page');
+        const userCenterPage = document.getElementById('user-center-page');
+        const successModal = document.getElementById('success-modal');
+        
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const registerLink = document.getElementById('register-link');
+        const logoutLinks = document.querySelectorAll('[id^="logout-link"]');
+        
+        const bookList = document.getElementById('book-list');
+        const searchInput = document.getElementById('search-input');
+        const headerUsername = document.getElementById('header-username');
+        const profileUsername = document.getElementById('profile-username');
+        const borrowStats = document.getElementById('borrow-stats');
+        const borrowedBooksList = document.getElementById('borrowed-books-list');
+        
+        const bookDetail = document.getElementById('book-detail');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const modalBookCoverImg = document.getElementById('modal-book-cover-img');
+        
+        // 页面切换函数
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // 导航链接点击事件
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.dataset.page);
+            });
+        });
+
+        // 退出登录
+        logoutLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage('login-page');
+            });
+        });
+
+        // 登录验证
+        loginBtn.addEventListener('click', function() {
+            let valid = true;
+            
+            if (!usernameInput.value.trim()) {
+                document.getElementById('username-error').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('username-error').style.display = 'none';
+            }
+            
+            if (!passwordInput.value.trim()) {
+                document.getElementById('password-error').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+            
+            if (valid) {
+                // 模拟登录成功
+                headerUsername.textContent = usernameInput.value;
+                profileUsername.textContent = usernameInput.value;
+                showPage('main-page');
+                renderBookList(books);
+                updateUserCenter();
+            }
+        });
+
+        // 注册链接点击事件
+        registerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('注册功能暂未实现');
+        });
+
+        // 渲染图书列表
+        function renderBookList(booksToRender) {
+            bookList.innerHTML = '';
+            
+            booksToRender.forEach(book => {
+                const isBorrowed = currentUser.borrowedBooks.some(b => b.bookId === book.id);
+                const available = book.available && !isBorrowed;
+                
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+                bookCard.innerHTML = `
+                    <div class="book-cover"><img src="${book.cover}" alt="${book.title}"></div>
+                    <div class="book-info">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">${book.author}</div>
+                        <div class="book-status">
+                            <span class="${available ? 'status-available' : 'status-unavailable'}">
+                                ${available ? '可借阅' : '不可借'}
+                            </span>
+                            <button class="borrow-btn" data-id="${book.id}" ${!available ? 'disabled' : ''}>
+                                借阅
+                            </button>
+                        </div>
+                    </div>
+                `;
+                bookList.appendChild(bookCard);
+            });
+            
+            // 添加借阅按钮事件
+            document.querySelectorAll('.borrow-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookId = parseInt(this.dataset.id);
+                    showBookDetail(bookId);
+                });
+            });
+        }
+
+        // 显示图书详情
+        function showBookDetail(bookId) {
+            const book = books.find(b => b.id === bookId);
+            const isBorrowed = currentUser.borrowedBooks.some(b => b.bookId === bookId);
+            const available = book.available && !isBorrowed;
+            
+            bookDetail.innerHTML = `
+                <div class="book-detail-header">
+                    <div class="detail-cover"><img src="${book.cover}" alt="${book.title}"></div>
+                    <div class="detail-info">
+                        <div class="detail-title">${book.title}</div>
+                        <div class="detail-meta">作者: ${book.author}</div>
+                        <div class="detail-meta">出版社: ${book.publisher}</div>
+                        <div class="detail-status">
+                            状态: <span class="${available ? 'status-available' : 'status-unavailable'}">
+                                ${available ? '可借阅' : '不可借'}
+                            </span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="back-btn" id="back-btn">返回列表</button>
+                            <button class="borrow-detail-btn" data-id="${book.id}" ${!available ? 'disabled' : ''}>
+                                借阅
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加返回按钮事件
+            document.getElementById('back-btn').addEventListener('click', function() {
+                showPage('main-page');
+            });
+            
+            // 添加详情页借阅按钮事件
+            document.querySelector('.borrow-detail-btn').addEventListener('click', function() {
+                borrowBook(bookId);
+            });
+            
+            showPage('detail-page');
+        }
+
+        // 借阅图书
+        function borrowBook(bookId) {
+            // 模拟借阅成功
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            currentUser.borrowedBooks.push({
+                bookId: bookId,
+                dueDate: dueDate.toISOString().split('T')[0]
+            });
+            
+            // 显示成功提示
+            const book = books.find(b => b.id === bookId);
+            modalBookCoverImg.src = book.cover;
+            modalBookCoverImg.alt = book.title;
+            document.getElementById('modal-book-title').textContent = book.title;
+            document.getElementById('modal-book-author').textContent = book.author;
+            document.getElementById('modal-due-date').textContent = `还书日期: ${dueDate.toISOString().split('T')[0]}`;
+            
+            successModal.style.display = 'flex';
+        }
+
+        // 确认按钮点击事件
+        confirmBtn.addEventListener('click', function() {
+            successModal.style.display = 'none';
+            showPage('main-page');
+            renderBookList(books);
+            updateUserCenter();
+        });
+
+        // 更新用户中心
+        function updateUserCenter() {
+            const borrowedCount = currentUser.borrowedBooks.length;
+            borrowStats.textContent = `已借阅 ${borrowedCount} 本 (最多可借 ${currentUser.maxBorrow} 本)`;
+            
+            if (borrowedCount === 0) {
+                borrowedBooksList.innerHTML = '<p>当前没有借阅的图书</p>';
+                return;
+            }
+            
+            borrowedBooksList.innerHTML = '';
+            currentUser.borrowedBooks.forEach(borrowed => {
+                const book = books.find(b => b.id === borrowed.bookId);
+                if (!book) return;
+                
+                // 计算剩余天数
+                const today = new Date();
+                const dueDate = new Date(borrowed.dueDate);
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                const bookItem = document.createElement('div');
+                bookItem.className = 'book-item';
+                bookItem.innerHTML = `
+                    <div class="book-item-cover"><img src="${book.cover}" alt="${book.title}"></div>
+                    <div class="book-item-info">
+                        <div class="book-item-title">${book.title}</div>
+                        <div class="book-item-meta">${book.author} · ${book.publisher}</div>
+                        <div class="book-item-days">剩余30天</div>
+                    </div>
+                    <button class="return-btn" data-id="${book.id}">归还</button>
+                `;
+                borrowedBooksList.appendChild(bookItem);
+                
+                // 添加归还按钮事件
+                bookItem.querySelector('.return-btn').addEventListener('click', function() {
+                    returnBook(book.id);
+                });
+            });
+        }
+
+        // 归还图书
+        function returnBook(bookId) {
+            currentUser.borrowedBooks = currentUser.borrowedBooks.filter(b => b.bookId !== bookId);
+            updateUserCenter();
+            renderBookList(books);
+        }
+
+        // 搜索功能
+        searchInput.addEventListener('input', function() {
+            const keyword = this.value.toLowerCase();
+            if (!keyword) {
+                renderBookList(books);
+                return;
+            }
+            
+            const filteredBooks = books.filter(book => 
+                book.title.toLowerCase().includes(keyword) || 
+                book.author.toLowerCase().includes(keyword) ||
+                book.publisher.toLowerCase().includes(keyword)
+            );
+            
+            renderBookList(filteredBooks);
+        });
+
+        // 初始化
+        function init() {
+            renderBookList(books);
+            updateUserCenter();
+        }
+
+        init();
+    </script>
+</body>
+</html>
